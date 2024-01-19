@@ -16,7 +16,7 @@
 ## GPS 사용
   - ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION 권한 받아오기
   - FusedLocationClient 가져오기
-  - requestLocationUpdates로 현재 위치 가져오기
+  - [requestLocationUpdates](https://developer.android.com/training/location/change-location-settings?hl=ko)로 현재 위치 가져오기
   - lastLocation을 통해 마지막 위치 가져오기
   - 백그라운드 위치는 구현 X
 
