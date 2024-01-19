@@ -2,6 +2,8 @@ package org.shop.sharelocation
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import com.kakao.sdk.common.util.Utility
 import org.shop.sharelocation.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -13,5 +15,7 @@ class MainActivity : AppCompatActivity() {
             setContentView(it.root)
         }
 
+        var keyHash = Utility.getKeyHash(this)
+        Log.e("MainActivity Keyhash", keyHash)
     }
 }
