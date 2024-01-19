@@ -46,6 +46,8 @@ dependencies {
 
     // Firebase
     implementation(platform("com.google.firebase:firebase-bom:32.7.1"))
+    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-database-ktx")
 
     // Google Maps
     implementation("com.google.android.gms:play-services-maps:18.2.0")
