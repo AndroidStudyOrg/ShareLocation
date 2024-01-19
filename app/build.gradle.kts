@@ -1,6 +1,8 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("com.google.gms.google-services")
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
 
 android {
@@ -39,7 +41,14 @@ android {
 }
 
 dependencies {
+    // Kako 로그인
     implementation("com.kakao.sdk:v2-user:2.19.0")
+
+    // Firebase
+    implementation(platform("com.google.firebase:firebase-bom:32.7.1"))
+
+    // Google Maps
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
 
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
