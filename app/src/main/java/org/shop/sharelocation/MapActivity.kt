@@ -42,6 +42,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
 import org.shop.sharelocation.databinding.ActivityMapBinding
+import java.lang.Long.MAX_VALUE
 
 class MapActivity : AppCompatActivity(), OnMapReadyCallback, OnMarkerClickListener {
     private lateinit var binding: ActivityMapBinding
@@ -107,6 +108,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, OnMarkerClickListen
         setUpHeartEmojiAnimationView()
         setUpThumbEmojiAnimationView()
 
+        setUpCurrentLocationView()
+
         requestLocationPermission()
         setUpFirebaseDatabase()
     }
@@ -145,16 +148,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, OnMarkerClickListen
             Looper.getMainLooper()
         )
 
-        fusedLocationClient.lastLocation.addOnSuccessListener {
-            googleMap.animateCamera(
-                CameraUpdateFactory.newLatLngZoom(
-                    LatLng(
-                        it.latitude,
-                        it.longitude
-                    ), 16.0f
-                )
-            )
-        }
+        moveLastLocation()
     }
 
     private fun requestLocationPermission() {
@@ -248,6 +242,39 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, OnMarkerClickListen
         binding.centerLottieAnimationView.speed = 3f
     }
 
+    private fun setUpCurrentLocationView() {
+        binding.currentLocationButton.setOnClickListener {
+            trackingPersonId = ""
+            moveLastLocation()
+        }
+    }
+
+    private fun moveLastLocation() {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+            && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestLocationPermission()
+            return
+        }
+
+        fusedLocationClient.lastLocation.addOnSuccessListener {
+            googleMap.moveCamera(
+                CameraUpdateFactory.newLatLngZoom(
+                    LatLng(
+                        it.latitude,
+                        it.longitude
+                    ), 16.0f
+                )
+            )
+        }
+    }
+
     private fun setUpFirebaseDatabase() {
         Firebase.database.reference.child("Person")
             .addChildEventListener(object : ChildEventListener {
@@ -283,13 +310,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, OnMarkerClickListen
                     }
                 }
 
-                override fun onChildRemoved(snapshot: DataSnapshot) {
+                override fun onChildRemoved(snapshot: DataSnapshot) {}
 
-                }
-
-                override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
-
-                }
+                override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
 
                 override fun onCancelled(error: DatabaseError) {}
 
@@ -298,48 +321,56 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, OnMarkerClickListen
         Firebase.database.reference.child("Emoji").child(Firebase.auth.currentUser?.uid ?: "")
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    val lottie = snapshot.getValue(Lottie::class.java) ?: return
-                    when (lottie.type) {
-                        "basic" -> {
-                            binding.centerLottieAnimationView.apply {
-                                setAnimation(R.raw.emoji_basic)
-                                playAnimation()
-                                animate().scaleX(3f).scaleY(3f).alpha(0.3f)
-                                    .setDuration(this.duration / 3)
-                                    .withEndAction {
-                                        this.scaleX = 0f
-                                        this.scaleY = 0f
-                                        this.alpha = 1f
-                                    }.start()
-                            }
-                        }
+                    val emoji = snapshot.getValue(EmojiType::class.java) ?: return
+                    Log.e("MapActivity-Emoji", emoji.toString())
+                    Log.e("MapActivity-Emoji-currentTime", System.currentTimeMillis().toString())
+                    Log.e("MapActivity-Emoji-lastModifier", emoji.lastModifier.toString())
 
-                        "heart" -> {
-                            binding.centerLottieAnimationView.apply {
-                                setAnimation(R.raw.emoji_heart)
-                                playAnimation()
-                                animate().scaleX(3f).scaleY(3f).alpha(0.3f)
-                                    .setDuration(this.duration / 3)
-                                    .withEndAction {
-                                        this.scaleX = 0f
-                                        this.scaleY = 0f
-                                        this.alpha = 1f
-                                    }.start()
+                    if (System.currentTimeMillis() < (emoji.lastModifier ?: MAX_VALUE)) {
+                        when (emoji.type) {
+                            "basic" -> {
+                                binding.centerLottieAnimationView.apply {
+                                    setAnimation(R.raw.emoji_basic)
+                                    playAnimation()
+                                    animate().scaleX(3f).scaleY(3f).alpha(0.3f)
+                                        .setDuration(this.duration / 3)
+                                        .withEndAction {
+                                            this.scaleX = 0f
+                                            this.scaleY = 0f
+                                            this.alpha = 1f
+                                        }.start()
+                                }
                             }
-                        }
 
-                        "thumb" -> {
-                            binding.centerLottieAnimationView.apply {
-                                setAnimation(R.raw.emoji_thumbsup)
-                                playAnimation()
-                                animate().scaleX(3f).scaleY(3f).alpha(0.3f)
-                                    .setDuration(this.duration / 3)
-                                    .withEndAction {
-                                        this.scaleX = 0f
-                                        this.scaleY = 0f
-                                        this.alpha = 1f
-                                    }.start()
+                            "heart" -> {
+                                binding.centerLottieAnimationView.apply {
+                                    setAnimation(R.raw.emoji_heart)
+                                    playAnimation()
+                                    animate().scaleX(3f).scaleY(3f).alpha(0.3f)
+                                        .setDuration(this.duration / 3)
+                                        .withEndAction {
+                                            this.scaleX = 0f
+                                            this.scaleY = 0f
+                                            this.alpha = 1f
+                                        }.start()
+                                }
                             }
+
+                            "thumb" -> {
+                                binding.centerLottieAnimationView.apply {
+                                    setAnimation(R.raw.emoji_thumbsup)
+                                    playAnimation()
+                                    animate().scaleX(3f).scaleY(3f).alpha(0.3f)
+                                        .setDuration(this.duration / 3)
+                                        .withEndAction {
+                                            this.scaleX = 0f
+                                            this.scaleY = 0f
+                                            this.alpha = 1f
+                                        }.start()
+                                }
+                            }
+
+                            else -> {}
                         }
                     }
                 }
@@ -397,7 +428,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, OnMarkerClickListen
     override fun onMapReady(map: GoogleMap) {
         googleMap = map
         googleMap.uiSettings.isZoomControlsEnabled = true
-        googleMap.uiSettings.isMyLocationButtonEnabled = true
 
         googleMap.setMaxZoomPreference(20.0f)
         googleMap.setMinZoomPreference(10.0f)

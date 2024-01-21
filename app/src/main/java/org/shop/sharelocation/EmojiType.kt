@@ -1,6 +1,6 @@
 package org.shop.sharelocation
 
-data class Lottie(
+data class EmojiType(
     var lastModifier: Long? = null,
     var type: String? = null
 )

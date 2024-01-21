@@ -2,7 +2,13 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.ShareLocation" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorPrimary">@color/black</item>
+        <item name="colorPrimaryVariant">@color/black</item>
+        <item name="colorOnPrimary">@color/white</item>
+
+        <item name="colorSecondary">@color/brown</item>
+        <item name="colorSecondaryVariant">@color/basic</item>
+        <item name="colorOnSecondary">@color/white</item>
     </style>
 
     <style name="Theme.ShareLocation" parent="Base.Theme.ShareLocation" />
